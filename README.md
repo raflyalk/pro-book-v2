@@ -8,5 +8,5 @@ Pada tugas 2, Developer diminta untuk mengembangkan aplikasi toko buku online se
 ## Pengembang
 
 - **[13516038 - Mochamad Alghifari](http://gitlab.informatika.org/mo.alghifari)**
-- **[13516056 - M Rafli Al Khadafi](http://gitlab.informatika.org/raflyalk-1)**
+- **[13516056 - M Rafli Al Khadafi](http://gitlab.informatika.org/raflyalk)**
 - **[13516059 - Ivan Jonathan](http://gitlab.informatika.org/ivanj09)**
