@@ -29,3 +29,6 @@ Route::put('profile/edit', 'UserController@update');
 Route::post('apis/create-order', 'CreateOrder');
 Route::get('apis/validate-email', 'ValidateEmail');
 Route::get('apis/validate-username', 'ValidateUsername');
+
+//Experimental
+Route::get('testservice', 'SoapServiceController');
