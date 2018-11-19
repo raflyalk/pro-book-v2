@@ -5,15 +5,15 @@ require_once('./libs/nusoap/nusoap.php');
 class SoapServiceController extends Controller
 {
   public function __construct(){
-    $client = new nusoap_client('http://localhost:4789/services/order?wsdl', 'wsdl');
+    $client = new nusoap_client('http://localhost:4789/services/search?wsdl', 'wsdl');
 
     if ($client->getError()){
       echo 'error!';
     } else {
       // specific service call
-      $result = $client->call('getOrders');
+      $result = $client->call('getBookDetails', array("zyTCAlFPjgYC"));
 
-      print_r($result);
+      die($client->response);
     }
   }
 }

@@ -1,7 +1,7 @@
 package ws;
 
-import javax.jws.WebMethod;
 import javax.jws.WebService;
+import javax.jws.WebMethod;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
 
@@ -9,8 +9,5 @@ import javax.jws.soap.SOAPBinding.Style;
 @SOAPBinding(style = Style.RPC)
 public interface OrderService {
 	@WebMethod
-	String[] getOrders();
-	
-	@WebMethod
-	boolean addOrders(String order);
+	String order(String id, String count, String accountNumber);
 }
