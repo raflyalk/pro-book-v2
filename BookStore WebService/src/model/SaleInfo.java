@@ -9,16 +9,8 @@ public class SaleInfo {
 		@Expose
 		private int amount;
 		
-		@SerializedName("currencyCode")
-		@Expose
-		private String currencyCode;
-		
 		public int getAmount() {
 			return amount;
-		}
-		
-		public String getCurrencyCode() {
-			return currencyCode;
 		}
 	}
 	
