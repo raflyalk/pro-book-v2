@@ -23,18 +23,13 @@ DROP TABLE IF EXISTS `books`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `books` (
-  `id` int(10) NOT NULL,
+  `id` int(10) NOT NULL AUTO_INCREMENT,
   `book_id` varchar(255) DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `author` varchar(255) DEFAULT NULL,
-  `description` text,
-  `avg_rating` float(1,1) DEFAULT NULL,
   `quantity` int(10) DEFAULT NULL,
   `price` float(11,1) DEFAULT NULL,
-  `thumbnail` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `book_id` (`book_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,6 +38,7 @@ CREATE TABLE `books` (
 
 LOCK TABLES `books` WRITE;
 /*!40000 ALTER TABLE `books` DISABLE KEYS */;
+INSERT INTO `books` VALUES (1,'IwMfDgAAQBAJ',100,57226.0),(2,'caZ7DQAAQBAJ',250,383433.0);
 /*!40000 ALTER TABLE `books` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -54,13 +50,14 @@ DROP TABLE IF EXISTS `orders`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `orders` (
-  `id` int(10) NOT NULL,
+  `id` int(10) NOT NULL AUTO_INCREMENT,
   `user_id` int(10) DEFAULT NULL,
-  `book_id` int(10) DEFAULT NULL,
+  `book_id` varchar(255) DEFAULT NULL,
   `category` varchar(255) DEFAULT NULL,
+  `quantity` int(10) DEFAULT NULL,
   `ordered_by` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,6 +66,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+INSERT INTO `orders` VALUES (1,1,'IwMfDgAAQBAJ','Games & Activities / Quizzes',100,'2018-11-20 00:00:00'),(2,1,'IwMfDgAAQBAJ','Fiction / Media Tie-In',100,'2018-11-20 00:00:00'),(3,1,'IwMfDgAAQBAJ','Reference / Trivia',100,'2018-11-20 00:00:00');
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -81,4 +79,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-20  7:50:03
+-- Dump completed on 2018-11-20 16:29:52
