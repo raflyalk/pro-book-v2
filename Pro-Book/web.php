@@ -4,6 +4,7 @@ require_once('./libs/route.php');
 /** Auth */
 Route::get('login', 'Auth@login');
 Route::post('login', 'Auth@handleLogin');
+Route::post('loginbygoogle', 'Auth@handleLoginByGoogle');
 Route::post('logout', 'Auth@logout');
 Route::get('register', 'Auth@register');
 Route::post('register', 'Auth@handleRegister');

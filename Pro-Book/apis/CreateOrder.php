@@ -8,14 +8,20 @@ class CreateOrder
   /**
    * Run a single action controller.
    * Create book order.
-   * 
+   *
    * @param array of request.
    * @return object json result.
    */
   public function run($request)
   {
     $order = new Order();
-    $request['user_id'] = Auth::user()['id'];
+
+    if (Session::exist('isloginbygoogle')){
+      $request['user_id'] = Session::get('google')['username'];
+    } else {
+      $request['user_id'] = Auth::user()['id'];
+    }
+
     $orderId = $order->create($request);
     $orderStatus = [
       'status_code' => ($orderId !== null? '200' : '500'),

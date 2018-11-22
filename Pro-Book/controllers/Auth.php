@@ -34,12 +34,16 @@ class Auth extends Controller
 
       if ($now <= Session::get('expire_time')){
         $accessToken = self::parseToken();
-        $user = new User();
+        $google = 'google';
 
-        if ($user->find($accessToken['id']) && $accessToken['agent'] == Client::getUserAgent() && $accessToken['ip'] == Client::getIpAddress()) {
+        if (strpos($accessToken['id'], $google) !== false){
           return true;
         } else {
-          return false;
+          $user = new User();
+
+          if ($user->find($accessToken['id']) && $accessToken['agent'] == Client::getUserAgent() && $accessToken['ip'] == Client::getIpAddress()) {
+            return true;
+          }
         }
       } else {
         Session::unset('access_token');
@@ -109,6 +113,8 @@ class Auth extends Controller
     Session::start();
     Session::unset('access_token');
     Session::unset('expire_time');
+    Session::unset('google');
+    Session::unset('isloginbygoogle');
 
     return $this->view('login.php');
   }
@@ -146,6 +152,34 @@ class Auth extends Controller
     return $this->redirect('/index.php/login', [
       'message' => 'Invalid username or password, try again!',
     ]);
+  }
+
+  /**
+   * Login handler.
+   *
+   * @return view home.php and guaranted authorized
+   */
+  public function handleLoginByGoogle($request)
+  {
+    $isSignedIn = true;
+    $google = 'google';
+    $expire = time() + 7200;
+    $ipAddress = Client::getIpAddress();
+    $userAgent = Client::getUserAgent();
+
+    $request['address'] = 'No available';
+    $request['phone_number'] = 'No available';
+
+    $value = $google . $request['username'] . '@' . $ipAddress . '@' . $userAgent;
+    $value = bin2hex($value);
+
+    Session::start();
+    Session::set('access_token', $value);
+    Session::set('expire_time', $expire);
+    Session::set('google', $request);
+    Session::set('isloginbygoogle', $isSignedIn);
+
+    return $this->redirect('/index.php/home');
   }
 
   /**
