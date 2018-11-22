@@ -10,7 +10,7 @@ const port = 3000;
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.USER, process.env.DB_PASS, {
   host: process.env.DB_HOST,
   dialect: 'mysql'
-})
+});
 
 app.use(bodyParser.json());
 
@@ -26,7 +26,7 @@ app.get('/validate-card', (req, res) => {
 app.post('/transfer', (req, res) => {
   
 });
- 
+
 app.listen(port);
 
 console.log('Listening on port', port);
