@@ -7,7 +7,6 @@
 
   <body>
     <?php
-      Session::start();
       if (Session::exist('message')):
     ?>
       <div class="alert-box">

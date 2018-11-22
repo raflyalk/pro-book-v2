@@ -1,20 +1,22 @@
 <?php
 
 require_once('./models/User.php');
+require_once('./libs/client.php');
 
 class Auth extends Controller
 {
   /**
-  * Parse access_token cookie.
+  * Parse session access_token.
   *
   * @return array an associative array with key id and expire.
   */
   private function parseToken()
   {
-    $value = explode("@", hex2bin(Cookie::get('access_token')));
+    $value = explode("@", hex2bin(Session::get('access_token')));
     return [
       'id' => $value[0],
-      'expire' => $value[1],
+      'ip' => $value[1],
+      'agent' => $value[2]
     ];
   }
 
@@ -25,15 +27,24 @@ class Auth extends Controller
    */
   public static function check()
   {
-    if (Cookie::exist('access_token')) {
-      $accessToken = self::parseToken();
-      $user = new User();
+    Session::start();
 
-      if ($user->find($accessToken['id']) && $accessToken['expire'] >= time()) {
-        return true;
+    if (Session::exist('expire_time')) {
+      $now = time();
+
+      if ($now <= Session::get('expire_time')){
+        $accessToken = self::parseToken();
+        $user = new User();
+
+        if ($user->find($accessToken['id']) && $accessToken['agent'] == Client::getUserAgent() && $accessToken['ip'] == Client::getIpAddress()) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        Session::unset('access_token');
+        Session::unset('expire_time');
       }
-
-      Cookie::unset('access_token');
       return false;
     }
 
@@ -89,20 +100,23 @@ class Auth extends Controller
   }
 
   /**
-   * Unset cookie and redirect to login page.
+   * Unset Session and redirect to login page.
    *
    * @return view login.php
    */
   public function logout()
   {
-    Cookie::unset("access_token");
+    Session::start();
+    Session::unset('access_token');
+    Session::unset('expire_time');
+
     return $this->view('login.php');
   }
 
   /**
    * Login handler.
    *
-   * @return Session current logged in user, if authorized.
+   * @return view home.php, if authorized
    * @return view login.php, if unauthorized.
    */
   public function handleLogin($request)
@@ -114,10 +128,16 @@ class Auth extends Controller
 
     if ($user !== null){
       if (password_verify($password, $user['password'])) {
-        $expire = time() + 3600;
-        $value = $user['id'] . "@" . $expire;
+        $expire = time() + 7200;
+        $userAgent = Client::getUserAgent();
+        $ipAddress = Client::getIpAddress();
+
+        $value = $user['id'] . '@' . $ipAddress . '@' . $userAgent;
         $value = bin2hex($value);
-        Cookie::set('access_token', $value);
+
+        Session::start();
+        Session::set('access_token', $value);
+        Session::set('expire_time', $expire);
 
         return $this->redirect('/index.php/home');
       }
