@@ -14,6 +14,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.USER, process.e
 
 app.use(bodyParser.json());
 
+// APIs Goes Here
 app.get('/', (req, res) => {
   res.send('This is Pro-Book Bank-WebService');
 });
