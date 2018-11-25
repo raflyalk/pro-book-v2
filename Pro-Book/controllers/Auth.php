@@ -37,18 +37,27 @@ class Auth extends Controller
         $google = 'google';
 
         if (strpos($accessToken['id'], $google) !== false){
-          return true;
+          if ($accessToken['agent'] === Client::getUserAgent() && $accessToken['ip'] === Client::getIpAddress()){
+            return true;
+          } else {
+            return false;
+          }
         } else {
           $user = new User();
 
-          if ($user->find($accessToken['id']) && $accessToken['agent'] == Client::getUserAgent() && $accessToken['ip'] == Client::getIpAddress()) {
+          if ($user->find($accessToken['id']) && $accessToken['agent'] === Client::getUserAgent() && $accessToken['ip'] === Client::getIpAddress()) {
             return true;
+          } else {
+            return false;
           }
         }
-      } else {
-        Session::unset('access_token');
-        Session::unset('expire_time');
       }
+
+      Session::unset('access_token');
+      Session::unset('expire_time');
+      Session::unset('google');
+      Session::unset('isloginbygoogle');
+
       return false;
     }
 

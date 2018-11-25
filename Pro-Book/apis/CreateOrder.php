@@ -16,8 +16,11 @@ class CreateOrder
   {
     $order = new Order();
 
+    Session::start();
+
     if (Session::exist('isloginbygoogle')){
-      $request['user_id'] = Session::get('google')['username'];
+      $userid = (int) Session::get('google')['username'];
+
     } else {
       $request['user_id'] = Auth::user()['id'];
     }
