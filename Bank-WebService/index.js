@@ -21,20 +21,17 @@ app.get('/', (req, res) => {
 });
 
 app.get('/validate-card', (req, res) => {
-  sequelize.query("SELECT COUNT(1) as isExist FROM Accounts WHERE card_number = " + req.query.card_number + ";").then(
-    function(result) {
-      res.send(result[0][0]);
+  models.Account.count({
+    where: {
+      card_number: req.query.card_number
     }
-  );  
+  })
+  .then((result) => {
+    result = {isExist: result};
+    res.send(result);
+  });
 });
 
-/**
- * {
- *  sender_card_number,
- *  receiver_card_number,
- *  transfer_amount
- * }
- */
 app.post('/transfer', (req, res) => {
   Promise.all([
     models.Account.findOne({

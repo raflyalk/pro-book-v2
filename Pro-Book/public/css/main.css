@@ -80,7 +80,6 @@ html {
 
 /*Container for register and login*/
 .container {
-  text-transform: capitalize;
   margin: auto;
   min-width: 400px;
   /* default min-width: 400px*/

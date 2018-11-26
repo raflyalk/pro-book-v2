@@ -26,6 +26,7 @@ class User extends Model
     $email = $this->toSqlString($data['email']);
     $address = $this->toSqlString($data['address']);
     $phoneNumber = $this->toSqlString($data['phone']);
+    $card_number = $this->toSqlString($data['card_number']);
     $imagePath = $this->toSqlString('/public/images/example_user.jpg');
     // Copy example image.
     $baseDir = $_SERVER['DOCUMENT_ROOT'];
@@ -41,8 +42,8 @@ class User extends Model
     $password = $this->toSqlString(password_hash($data['password'], PASSWORD_DEFAULT));
 
     $query = "INSERT INTO $this->table
-              (name, username, email, address, phone_number, image_path, password)
-              VALUES ($name, $username, $email, $address, $phoneNumber, $imagePath, $password)";
+              (name, username, email, address, phone_number, image_path, password, card_number)
+              VALUES ($name, $username, $email, $address, $phoneNumber, $imagePath, $password, $card_number)";
     $stmt = $this->db->prepare($query);
 
     if ($stmt->execute()) {
@@ -117,6 +118,29 @@ class User extends Model
     $email = $this->toSqlString($email);
 
     $query = "SELECT * FROM $this->table WHERE email = $email";
+    $stmt = $this->db->prepare($query);
+
+    if ($stmt->execute()) {
+      $stmt = $stmt->get_result();
+      if ($stmt->num_rows > 0) {
+        return $this->toArray($stmt)[0];
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get user by card number.
+   *
+   * @param string card number.
+   * @return object User
+   */
+  public function getByCardNumber($card_number)
+  {
+    $card_number = $this->toSqlString($card_number);
+
+    $query = "SELECT * FROM $this->table WHERE card_number = $card_number";
     $stmt = $this->db->prepare($query);
 
     if ($stmt->execute()) {
