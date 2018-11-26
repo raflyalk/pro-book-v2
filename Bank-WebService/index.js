@@ -28,15 +28,63 @@ app.get('/validate-card', (req, res) => {
   );  
 });
 
-app.get('/transfer', (req, res) => {
-  models.Account.findAll({
-    where: {
-      card_number: 123123123
-    }
+/**
+ * {
+ *  sender_card_number,
+ *  receiver_card_number,
+ *  transfer_amount
+ * }
+ */
+app.post('/transfer', (req, res) => {
+  Promise.all([
+    models.Account.findOne({
+      attributes: ['card_number', 'balance'],
+      where: {
+        card_number: req.body.sender_card_number
+      }
+    })
+    .then((result) => {
+      return new Promise((resolve, reject) => {
+        if (!result) {
+          reject("Sender Account Not Found");
+        } else if (result.dataValues.balance < req.body.transfer_amount) {
+          reject("Insufficient Sender Balance");
+        } else {
+          resolve(result);
+        }
+      });
+    })
+    .catch((error) => {
+      res.send(error);
+    }),
+
+    models.Account.findOne({
+      attributes: ['card_number'],
+      where: {
+        card_number: req.body.receiver_card_number
+      }
+    })
+    .then((result) => {
+      return new Promise((resolve, reject) => {
+        if (!result) {
+          reject("Receiver Account Not Found");
+        } else {
+          resolve(result);
+        }
+      });
+    })
+    .catch((error) => {
+      res.send(error);
+    }),
+  ])
+  .then((result) => {
+    // Start decreasing sender balance and increasing receiver balance
+    res.send('Transaction successful');
   })
-  .then((account) => {
-    console.log(account);
-  });
+  .catch((error) => {
+    console.log(error);
+    res.send(error);
+  })
 });
 
 app.listen(port);
