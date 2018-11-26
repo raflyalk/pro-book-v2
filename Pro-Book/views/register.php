@@ -75,6 +75,7 @@
           document.registerForm.confirmation,
           document.registerForm.address,
           document.registerForm.phone,
+          document.registerForm.card_number,
         ])
       );
 
@@ -113,15 +114,18 @@
 
       const usernameValid = document.getElementById('usernameValid').value == 1;
       const emailValid = document.getElementById('emailValid').value == 1;
+      const cardNumberValid = document.getElementById('cardNumberValid').value == 1;
 
-      if (validity.result && usernameValid && emailValid) {
+      if (validity.result && usernameValid && emailValid && cardNumberValid) {
         document.registerForm.submit();
       } else if (validity.message !== 'OK') {
         validation.display(validity.message);
       } else if (!usernameValid) {
         validation.display('username is already used');
-      } else {
+      } else if (!emailValid) {
         validation.display('email is already used');
+      } else  {
+        validation.display('card number is already used');
       }
     }
 
@@ -169,6 +173,33 @@
             img.src = '/public/images/svg/check-sign.svg';
           } else {
             document.getElementById('emailValid').value = 0;
+            img.hidden = false;
+            img.src = '/public/images/svg/remove-symbol.svg';
+          };
+        } else {
+          console.log('Request failed.  Returned status of ' + xhr.status);
+        }
+      };
+      xhr.send();
+    };
+    
+      document.getElementById('cardNumberField').onblur = function () {
+      const value = this.value;
+      const xhr = new XMLHttpRequest();
+      const expValid = validation.required([
+        document.registerForm.card_number,
+      ]).result;
+      xhr.open('GET', `/index.php/apis/validate-card-number?card-number=${value}`);
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          const available = JSON.parse(xhr.responseText).result;
+          var img = document.getElementById('cardNumberValidity');
+          if (expValid && available) {
+            document.getElementById('cardNumberValid').value = 1;
+            img.hidden = false;
+            img.src = '/public/images/svg/check-sign.svg';
+          } else {
+            document.getElementById('cardNumberValid').value = 0;
             img.hidden = false;
             img.src = '/public/images/svg/remove-symbol.svg';
           };
