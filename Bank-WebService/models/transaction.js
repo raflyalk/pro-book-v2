@@ -1,10 +1,10 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var Transaction = sequelize.define('Transaction', {
-    sender_card: DataTypes.INT,
-    receiver_card: DataTypes.INT,
+    sender_card: DataTypes.INTEGER,
+    receiver_card: DataTypes.INTEGER,
     amount: DataTypes.FLOAT,
-    transaction_time: DataTypes.TIMESTAMP
+    transaction_time: DataTypes.DATE
   }, {});
   Transaction.associate = function(models) {
     // associations can be defined here

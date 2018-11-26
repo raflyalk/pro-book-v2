@@ -3,11 +3,12 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const Sequelize = require('sequelize');
+const models = require('./models');
 
 const app = express();
 const port = 3000;
 
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.USER, process.env.DB_PASS, {
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
   host: process.env.DB_HOST,
   dialect: 'mysql'
 });
@@ -20,11 +21,22 @@ app.get('/', (req, res) => {
 });
 
 app.get('/validate-card', (req, res) => {
-  
+  sequelize.query("SELECT COUNT(1) as isExist FROM Accounts WHERE card_number = " + req.query.card_number + ";").then(
+    function(result) {
+      res.send(result[0][0]);
+    }
+  );  
 });
 
-app.post('/transfer', (req, res) => {
-  
+app.get('/transfer', (req, res) => {
+  models.Account.findAll({
+    where: {
+      card_number: 123123123
+    }
+  })
+  .then((account) => {
+    console.log(account);
+  });
 });
 
 app.listen(port);

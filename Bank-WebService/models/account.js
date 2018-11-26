@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   var Account = sequelize.define('Account', {
     card_number: {
-      type: DataTypes.INT,
+      type: DataTypes.INTEGER,
       primaryKey: true
     },
     name: DataTypes.STRING,
