@@ -56,7 +56,7 @@ app.post('/transfer', (req, res) => {
     }),
 
     models.Account.findOne({
-      attributes: ['card_number'],
+      attributes: ['card_number', 'balance'],
       where: {
         card_number: req.body.receiver_card_number
       }
@@ -75,8 +75,33 @@ app.post('/transfer', (req, res) => {
     }),
   ])
   .then((result) => {
-    // Start decreasing sender balance and increasing receiver balance
-    res.send('Transaction successful');
+    // Create transaction to update both account balance and store order details
+    return sequelize.transaction((t) => {
+      return result[0].update({
+        balance: result[0].balance - req.body.transfer_amount
+      }, { transaction: t })
+      .then(() => {
+        return result[1].update({
+          balance: result[1].balance + req.body.transfer_amount
+        }, { transaction: t })
+      })
+      .then(() => {
+        return models.Transaction.create({
+          sender_card: result[0].dataValues.card_number,
+          receiver_card: result[1].dataValues.card_number,
+          amount: req.body.transfer_amount,
+          transaction_time: new Date()
+        }, { transaction: t })
+      });
+    })
+    .then(() => {
+      console.log('Transaction has been committed');
+      res.send('Transaction successful');
+    })
+    .catch((err) => {
+      console.log('Transaction has been rolled back');
+      res.send('Transaction unsuccessful');
+    })
   })
   .catch((error) => {
     console.log(error);
