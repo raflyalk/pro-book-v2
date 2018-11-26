@@ -52,6 +52,12 @@
         <label>Phone Number</label>
         <input type="text" class="form-control" name="phone" type="text" placeholder="phone">
       </div>
+      <div class="form-control m-8 pb-32">
+        <label>Card Number</label>
+        <input type="hidden" id="cardNumberValid">
+        <input type="text" class="form-control" name="card_number" type="text" id="cardNumberField" placeholder="card number">
+        <img id="cardNumberValidity" hidden class="validity"/>
+      </div>
       <div class="form-control ml-24 p-8" style="text-align: left;">
         <a href="/index.php/login">Already have an account?</a>
       </div>
