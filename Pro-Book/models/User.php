@@ -26,6 +26,7 @@ class User extends Model
     $email = $this->toSqlString($data['email']);
     $address = $this->toSqlString($data['address']);
     $phoneNumber = $this->toSqlString($data['phone']);
+    $card_number = $this->toSqlString($data['card_number']);
     $imagePath = $this->toSqlString('/public/images/example_user.jpg');
     // Copy example image.
     $baseDir = $_SERVER['DOCUMENT_ROOT'];
@@ -41,8 +42,8 @@ class User extends Model
     $password = $this->toSqlString(password_hash($data['password'], PASSWORD_DEFAULT));
 
     $query = "INSERT INTO $this->table
-              (name, username, email, address, phone_number, image_path, password)
-              VALUES ($name, $username, $email, $address, $phoneNumber, $imagePath, $password)";
+              (name, username, email, address, phone_number, image_path, password, card_number)
+              VALUES ($name, $username, $email, $address, $phoneNumber, $imagePath, $password, $card_number)";
     $stmt = $this->db->prepare($query);
 
     if ($stmt->execute()) {
