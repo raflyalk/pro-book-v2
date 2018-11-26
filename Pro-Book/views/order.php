@@ -148,6 +148,9 @@
                 <?php echo $recommendedbook->volumeInfo->averageRating; ?> / 5.0
               </p>
             </div>
+            <form method="get" action="/index.php/book">
+              <button type="submit" name="id" class="btn-primary btn mb-48 mr-16" style="float: right;" value="<?php echo $recommendedbook->id; ?>">Detail</button>
+            </form>
           <?php
               endforeach;
             } else {

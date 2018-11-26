@@ -51,7 +51,7 @@
               <div class="d-flex flex-column">
                 <h2 class="secondary m-0">{{book.volumeInfo.title}}</h2>
                 <p class="m-0"><b>{{book.volumeInfo.authors.join(", ")}} - {{checkAverageRating(book.volumeInfo)}}</b></p>
-                <p class="m-0 font-weight-light">{{book.volumeInfo.description}}</p>
+                <p class="m-0 font-weight-light">{{checkDescription(book.volumeInfo)}}</p>
               </div>
             </div>
             <form action="/index.php/book" method="get">

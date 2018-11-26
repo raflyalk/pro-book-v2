@@ -43,4 +43,16 @@ searchApp.controller('searchController', function($scope, $http){
 			return "No rating available..";
 		}
 	}
+
+  $scope.checkDescription = function(jsonObj){
+    if (!jsonObj.hasOwnProperty('description')){
+      return "This book does not have description..";
+    }
+
+    if (jsonObj.description.length > 255){
+      return jsonObj.description.substr(0,255) + "...";
+    } else{
+      return jsonObj.description;
+    }
+  }
 })
