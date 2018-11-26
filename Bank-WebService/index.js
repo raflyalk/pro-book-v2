@@ -2,18 +2,12 @@ require('dotenv').config();
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const Sequelize = require('sequelize');
 
 const transfer = require('./modules/transfer');
 const validate = require('./modules/validate');
 
 const app = express();
 const port = 3000;
-
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-  host: process.env.DB_HOST,
-  dialect: 'mysql'
-});
 
 app.use(bodyParser.json());
 
