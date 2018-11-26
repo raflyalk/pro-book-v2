@@ -1,0 +1,6 @@
+WebContent/
+build/
+.settings/
+.classpath
+.BookStore WebService.iml
+.project
