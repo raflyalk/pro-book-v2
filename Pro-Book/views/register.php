@@ -114,9 +114,9 @@
 
       const usernameValid = document.getElementById('usernameValid').value == 1;
       const emailValid = document.getElementById('emailValid').value == 1;
-      const cardNumberValid = document.getElementById('cardNumberValid').value == 1;
+      const cardNumberValid = document.getElementById('cardNumberValid').value;
 
-      if (validity.result && usernameValid && emailValid && cardNumberValid) {
+      if (validity.result && usernameValid && emailValid && cardNumberValid == 1) {
         document.registerForm.submit();
       } else if (validity.message !== 'OK') {
         validation.display(validity.message);
@@ -124,8 +124,10 @@
         validation.display('username is already used');
       } else if (!emailValid) {
         validation.display('email is already used');
-      } else  {
+      } else if (cardNumberValid == -1) {
         validation.display('card number is already used');
+      } else if (cardNumberValid == -2) {
+        validation.display('card not yet registered in our bank service');
       }
     }
 
@@ -183,7 +185,7 @@
       xhr.send();
     };
 
-    function makeGetRequest(url, expValid) {
+    function makeGetRequest(url) {
       return new Promise(function(resolve, reject) {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url);
@@ -207,23 +209,30 @@
       const expValid = validation.required([
           document.registerForm.card_number,
         ]).result;
-      Promise.all([makeGetRequest(urlProbook, expValid)])
-      .then((result) => {
-        const resultJson = JSON.parse(result);
-        var img = document.getElementById('cardNumberValidity');
-        if (resultJson.result) {
-          document.getElementById('cardNumberValid').value = 1;
-          img.hidden = false;
-          img.src = '/public/images/svg/check-sign.svg';
-        } else  {
-          document.getElementById('cardNumberValid').value = 0;
-          img.hidden = false;
-          img.src = '/public/images/svg/remove-symbol.svg';
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+      if (expValid) {        
+        Promise.all([makeGetRequest(urlProbook), makeGetRequest(urlBank)])
+        .then((result) => {
+          resultProbook = JSON.parse(result[0]).result;
+          resultBank = JSON.parse(result[1]).isExist;
+          var img = document.getElementById('cardNumberValidity');
+          if (!resultProbook) {
+            document.getElementById('cardNumberValid').value = -1;
+            img.hidden = false;
+            img.src = '/public/images/svg/remove-symbol.svg'; 
+          } else if (!resultBank) {
+            document.getElementById('cardNumberValid').value = -2;
+            img.hidden = false;
+            img.src = '/public/images/svg/remove-symbol.svg'; 
+          } else {
+            document.getElementById('cardNumberValid').value = 1;
+            img.hidden = false;
+            img.src = '/public/images/svg/check-sign.svg';
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
     }
 
   </script>
