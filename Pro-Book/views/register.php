@@ -182,33 +182,50 @@
       };
       xhr.send();
     };
-    
-      document.getElementById('cardNumberField').onblur = function () {
-      const value = this.value;
-      const xhr = new XMLHttpRequest();
-      const expValid = validation.required([
-        document.registerForm.card_number,
-      ]).result;
-      xhr.open('GET', `/index.php/apis/validate-card-number?card-number=${value}`);
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          const available = JSON.parse(xhr.responseText).result;
-          var img = document.getElementById('cardNumberValidity');
-          if (expValid && available) {
-            document.getElementById('cardNumberValid').value = 1;
-            img.hidden = false;
-            img.src = '/public/images/svg/check-sign.svg';
+
+    function makeGetRequest(url, expValid) {
+      return new Promise(function(resolve, reject) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            resolve(xhr.responseText);
           } else {
-            document.getElementById('cardNumberValid').value = 0;
-            img.hidden = false;
-            img.src = '/public/images/svg/remove-symbol.svg';
-          };
-        } else {
-          console.log('Request failed.  Returned status of ' + xhr.status);
+            reject('Request failed.  Returned status of ' + xhr.status);
+          }
         }
-      };
-      xhr.send();
-    };
+        xhr.error = function()  {
+          reject('Request failed');
+        }
+        xhr.send();
+      });
+    }
+
+    document.getElementById('cardNumberField').onblur = function()  {
+      const urlProbook = `/index.php/apis/validate-card-number?card-number=${this.value}`;
+      const urlBank = `http://localhost:3000/validate-card?card_number=${this.value}`;
+      const expValid = validation.required([
+          document.registerForm.card_number,
+        ]).result;
+      Promise.all([makeGetRequest(urlProbook, expValid)])
+      .then((result) => {
+        const resultJson = JSON.parse(result);
+        var img = document.getElementById('cardNumberValidity');
+        if (resultJson.result) {
+          document.getElementById('cardNumberValid').value = 1;
+          img.hidden = false;
+          img.src = '/public/images/svg/check-sign.svg';
+        } else  {
+          document.getElementById('cardNumberValid').value = 0;
+          img.hidden = false;
+          img.src = '/public/images/svg/remove-symbol.svg';
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+    }
+
   </script>
 </body>
 </html>
