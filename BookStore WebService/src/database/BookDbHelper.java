@@ -1,12 +1,12 @@
 package database;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 public class BookDbHelper {
 	private final static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
@@ -15,7 +15,6 @@ public class BookDbHelper {
 	private final static String PASS = "Allofthings1";
 	private final static String ORDER_TABLE = "orders";
 	private final static String BOOK_TABLE = "books";
-	private final static String REVIEW_TABLE = "reviews";
 	private static Connection conn;
 	
 	private static Connection getConnectionInstance() {
@@ -48,23 +47,15 @@ public class BookDbHelper {
 	            + "   user_id			int(10),"
 	            + "   book_id			varchar(255),"
 	            + "   category			varchar(255),"
-	            + "	  quantity			int(10),"	
+	            + "	  quantity			int(10),"
+	            + "	  rating			int(1) NULL,"
+	            + "   comment			text NULL,"	
 	            + "   ordered_by		datetime)";
 
 	    Statement stmt = conn.createStatement();
 	    stmt.execute(sqlCreate);
 	}
 	
-//	private static void createReviewTableIfNotExist() throws SQLException {
-//		String sqlCreate = "CREATE TABLE IF NOT EXISTS " + REVIEW_TABLE
-//	            + "  (id				int(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
-//	            + "   book_id			varchar(255),"
-//	            + "   rating			char(1),"
-//	            + "	  comment			varchar(255))";
-//		
-//		Statement stmt = conn.createStatement();
-//		stmt.execute(sqlCreate);
-//	}
 	private static void createBookTableIfNotExist() throws SQLException {
 	    String sqlCreate = "CREATE TABLE IF NOT EXISTS " + BOOK_TABLE
 	            + "  (id				int(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
@@ -138,7 +129,7 @@ public class BookDbHelper {
 		return null;
 	}
 
-	public void insertOrder(int i, String id, String category, int quantity, Date sqlDate) throws SQLException {
+	public void insertOrder(int i, String id, String category, int quantity, Timestamp sqlDate) throws SQLException {
 		Connection conn = getConnectionInstance();
 		PreparedStatement prepareStmt = null;
 		
@@ -152,7 +143,7 @@ public class BookDbHelper {
 		prepareStmt.setString(2, id);
 		prepareStmt.setString(3, category);
 		prepareStmt.setInt(4, quantity);
-		prepareStmt.setDate(5, sqlDate);
+		prepareStmt.setTimestamp(5, sqlDate);
 		
 		prepareStmt.executeUpdate();
 	}

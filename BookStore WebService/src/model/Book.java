@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Book {
-	class SaleInfo {
+	public class SaleInfo {
 		@SerializedName("saleability")
 		private String saleability;
 		

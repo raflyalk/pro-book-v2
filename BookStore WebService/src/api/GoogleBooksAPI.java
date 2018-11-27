@@ -86,8 +86,17 @@ public class GoogleBooksAPI {
 			//Add price and quantity from db to book (from GBooks API)
 			BookDbHelper db = new BookDbHelper();
 			
+			Random rand = new Random();
+			float max = 500000f;
+			float min = 80000f;
+			
 			float price = db.getPriceWhereBookId(book.getId());
 			int quantity = db.getQuantityWhereBookId(book.getId());
+			
+			if (price == 0 && quantity == 0 && "FOR_SALE".equals(book.getSaleInfo().isSaleAbility())) {
+				price = rand.nextFloat() * (max-min) + min;
+				quantity = rand.nextInt(200) + 50;
+			}
 			
 			book.getVolumeInfo().setPrice(price);
 			book.getVolumeInfo().setQuantity(quantity);
@@ -183,9 +192,18 @@ public class GoogleBooksAPI {
 			//Add price and quantity from db to books (from GBooks API)
 			BookDbHelper db = new BookDbHelper();
 			
+			Random rand = new Random();
+			float max = 500000f;
+			float min = 80000f;
+			
 			for (Book book : books) {
 				float price = db.getPriceWhereBookId(book.getId());
 				int quantity = db.getQuantityWhereBookId(book.getId());
+				
+				if (price == 0 && quantity == 0 && "FOR_SALE".equals(book.getSaleInfo().isSaleAbility())) {
+					price = rand.nextFloat() * (max-min) + min;
+					quantity = rand.nextInt(200) + 50;
+				}
 				
 				book.getVolumeInfo().setPrice(price);
 				book.getVolumeInfo().setQuantity(quantity);

@@ -24,7 +24,7 @@ public final class OrderServiceImpl implements OrderService {
 		success = true;
 		if (success) {
 			Date date = new Date();
-			java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+			java.sql.Timestamp sqlDate = new java.sql.Timestamp(date.getTime());
 			
 			Book book = GoogleBooksAPI.getBookDetail(bookId);
 			

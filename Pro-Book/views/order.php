@@ -88,7 +88,7 @@
           <label class="mr-24">Jumlah: </label>
           <select id="qty">
             <?php
-              for($i = 1; $i <= 99; $i++):
+              for($i = 1; $i <= $book->volumeInfo->quantity; $i++):
             ?>
                 <option value="<?php echo $i;?>"><?php echo $i;?></option>
             <?php
