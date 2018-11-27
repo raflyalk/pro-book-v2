@@ -4,15 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Book {
-	public class SaleInfo {
-		@SerializedName("saleability")
-		private String saleability;
-		
-		public String isSaleAbility() {
-			return saleability;
-		}
-	}
-	
 	@SerializedName("id")
 	@Expose
 	private String id;

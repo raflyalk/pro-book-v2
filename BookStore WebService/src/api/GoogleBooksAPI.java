@@ -15,6 +15,7 @@ import com.google.gson.reflect.TypeToken;
 import database.BookDbHelper;
 import model.Book;
 import model.BookResponse;
+import model.Review;
 
 public class GoogleBooksAPI {
 	private final static String API_KEY = "AIzaSyCr4hc2SGelEmhfL2Wqo_dcdWZQvx9I4R4";
@@ -47,10 +48,19 @@ public class GoogleBooksAPI {
 			
 			//Add price and quantity from db to books (from GBooks API)
 			BookDbHelper db = new BookDbHelper();
+			Random rand = new Random();
 			
 			for (Book book : books) {
 				float price = db.getPriceWhereBookId(book.getId());
+				float avgRating = db.getAvgRatingByBookId(book.getId());
 				int quantity = db.getQuantityWhereBookId(book.getId());
+				
+				book.getVolumeInfo().setAverageRating(avgRating);
+				
+				if (price == 0 && quantity == 0 && "FOR_SALE".equals(book.getSaleInfo().isSaleAbility())) {
+					price = book.getSaleInfo().getRetailPrice().getAmount();
+					quantity = rand.nextInt(200) + 50;
+				}
 				
 				book.getVolumeInfo().setPrice(price);
 				book.getVolumeInfo().setQuantity(quantity);
@@ -87,14 +97,16 @@ public class GoogleBooksAPI {
 			BookDbHelper db = new BookDbHelper();
 			
 			Random rand = new Random();
-			float max = 500000f;
-			float min = 80000f;
 			
 			float price = db.getPriceWhereBookId(book.getId());
+			float avgRating = db.getAvgRatingByBookId(book.getId());
 			int quantity = db.getQuantityWhereBookId(book.getId());
 			
+			book.getVolumeInfo().addAllReview(db.getReviewsByBookId(book.getId()));
+			book.getVolumeInfo().setAverageRating(avgRating);
+			
 			if (price == 0 && quantity == 0 && "FOR_SALE".equals(book.getSaleInfo().isSaleAbility())) {
-				price = rand.nextFloat() * (max-min) + min;
+				price = book.getSaleInfo().getRetailPrice().getAmount();
 				quantity = rand.nextInt(200) + 50;
 			}
 			
@@ -130,11 +142,18 @@ public class GoogleBooksAPI {
 			//Add price and quantity from db to book (from GBooks API)
 			BookDbHelper db = new BookDbHelper();
 			
+			Random rand = new Random();
+			
 			float price = db.getPriceWhereBookId(book.getId());
+			float avgRating = db.getAvgRatingByBookId(book.getId());
 			int quantity = db.getQuantityWhereBookId(book.getId());
 			
-			book.getVolumeInfo().setPrice(price);
-			book.getVolumeInfo().setQuantity(quantity);
+			book.getVolumeInfo().setAverageRating(avgRating);
+			
+			if (price == 0 && quantity == 0 && "FOR_SALE".equals(book.getSaleInfo().isSaleAbility())) {
+				price = book.getSaleInfo().getRetailPrice().getAmount();
+				quantity = rand.nextInt(200) + 50;
+			}
 			
 			return book;
 		} catch (Exception e) {
@@ -162,7 +181,23 @@ public class GoogleBooksAPI {
 			ArrayList<Book> books = bookResponse.getBooks();
 			
 			//Get random book from books
-			return books.get(new Random().nextInt(books.size()));
+			Book book = books.get(new Random().nextInt(books.size()));
+			BookDbHelper db = new BookDbHelper();
+			
+			Random rand = new Random();
+			
+			float price = db.getPriceWhereBookId(book.getId());
+			float avgRating = db.getAvgRatingByBookId(book.getId());
+			int quantity = db.getQuantityWhereBookId(book.getId());
+			
+			book.getVolumeInfo().setAverageRating(avgRating);
+			
+			if (price == 0 && quantity == 0 && "FOR_SALE".equals(book.getSaleInfo().isSaleAbility())) {
+				price = book.getSaleInfo().getRetailPrice().getAmount();
+				quantity = rand.nextInt(200) + 50;
+			}
+			
+			return book;
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return null;
@@ -191,17 +226,17 @@ public class GoogleBooksAPI {
 			
 			//Add price and quantity from db to books (from GBooks API)
 			BookDbHelper db = new BookDbHelper();
-			
 			Random rand = new Random();
-			float max = 500000f;
-			float min = 80000f;
 			
 			for (Book book : books) {
 				float price = db.getPriceWhereBookId(book.getId());
+				float avgRating = db.getAvgRatingByBookId(book.getId());
 				int quantity = db.getQuantityWhereBookId(book.getId());
 				
+				book.getVolumeInfo().setAverageRating(avgRating);
+				
 				if (price == 0 && quantity == 0 && "FOR_SALE".equals(book.getSaleInfo().isSaleAbility())) {
-					price = rand.nextFloat() * (max-min) + min;
+					price = book.getSaleInfo().getRetailPrice().getAmount();
 					quantity = rand.nextInt(200) + 50;
 				}
 				

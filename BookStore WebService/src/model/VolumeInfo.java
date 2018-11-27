@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -46,6 +48,22 @@ public class VolumeInfo {
 	@Expose
 	private int quantity;
 	
+	@SerializedName("reviews")
+	@Expose
+	private ArrayList<Review> reviews = new ArrayList<>();
+	
+	public Review getReviewAt(int pos) {
+		return reviews.get(pos);
+	}
+	
+	public void addReview(Review review) {
+		reviews.add(review);
+	}
+	
+	public void addAllReview(ArrayList<Review> r) {
+		reviews.addAll(r);
+	}
+	
 	public float getPrice() {
 		return price;
 	}
@@ -76,6 +94,10 @@ public class VolumeInfo {
 	
 	public float getAverageRating() {
 		return averageRating;
+	}
+	
+	public void setAverageRating(float avgRating) {
+		averageRating = avgRating;
 	}
 	
 	public String[] getCategories() {

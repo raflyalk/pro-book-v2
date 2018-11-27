@@ -7,6 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+
+import model.Review;
 
 public class BookDbHelper {
 	private final static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
@@ -127,6 +130,59 @@ public class BookDbHelper {
 		}
 		
 		return null;
+	}
+	
+	public float getAvgRatingByBookId(String bookId) throws SQLException {
+		Connection conn = getConnectionInstance();
+		PreparedStatement prepareStmt = null;
+		
+		//SQL statement
+		String sql = "SELECT DISTINCT book_id, AVG(rating) as avg_rating" 
+				+ " FROM " + BookDbHelper.ORDER_TABLE
+				+ " WHERE book_id = \"" + bookId + "\"" 
+				+ " GROUP BY user_id, book_id";
+		
+		//Set prepared stmt
+		prepareStmt = conn.prepareStatement(sql);
+		
+		//Get result 
+		ResultSet rs = prepareStmt.executeQuery();
+		
+		//If exist
+		if (rs.next()) {
+			return rs.getFloat("avg_rating");
+		}
+		
+		return 0f;
+	}
+	
+	public ArrayList<Review> getReviewsByBookId(String bookId) throws SQLException {
+		Connection conn = getConnectionInstance();
+		PreparedStatement prepareStmt = null;
+		
+		//SQL statement
+		String sql = "SELECT DISTINCT user_id, book_id, ordered_by, rating, comment" 
+				+ " FROM " + BookDbHelper.ORDER_TABLE
+				+ " WHERE rating IS NOT NULL and comment IS NOT NULL and book_id =\"" + bookId + "\"";
+		
+		//Set prepared stmt
+		prepareStmt = conn.prepareStatement(sql);
+		
+		//Get result 
+		ResultSet rs = prepareStmt.executeQuery();
+		ArrayList<Review> reviews = new ArrayList<>();
+		
+		//If exist
+		if (rs.next()) {
+			Review review = new Review();
+			review.setComment(rs.getString("comment"));
+			review.setRating(rs.getInt("rating"));
+			review.setUserId(rs.getInt("user_id"));
+			
+			reviews.add(review);
+		}
+		
+		return reviews;
 	}
 
 	public void insertOrder(int i, String id, String category, int quantity, Timestamp sqlDate) throws SQLException {

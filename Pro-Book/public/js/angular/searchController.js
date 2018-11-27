@@ -10,7 +10,7 @@ searchApp.controller('searchController', function($scope, $http){
       document.getElementById("loading_text").innerHTML = "Retrieving data from Book WebService..";
       $http({
         method : "POST",
-        url : "/index.php/books",
+        url : "/index.php/search",
         data : {
           keyword: $scope.formData.search_bar
         },
