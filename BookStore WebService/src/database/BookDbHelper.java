@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import model.Order;
 import model.Review;
 
 public class BookDbHelper {
@@ -184,6 +185,38 @@ public class BookDbHelper {
 		
 		return reviews;
 	}
+	
+	public ArrayList<Order> getOrderHistoryById(int userId) throws SQLException {
+		Connection conn = getConnectionInstance();
+		PreparedStatement prepareStmt = null;
+		
+		//SQL statement
+		String sql = "SELECT DISTINCT id,book_id, quantity, rating, comment, ordered_by" 
+				+ " FROM " + BookDbHelper.ORDER_TABLE
+				+ " WHERE user_id =\"" + userId + "\"";
+		
+		//Set prepared stmt
+		prepareStmt = conn.prepareStatement(sql);
+		
+		//Get result 
+		ResultSet rs = prepareStmt.executeQuery();
+		ArrayList<Order> orders = new ArrayList<>();
+		
+		//If exist
+		if (rs.next()) {
+			Order order = new Order();
+			order.setId(rs.getInt("id"));
+			order.setComment(rs.getString("comment"));
+			order.setRating(rs.getInt("rating"));
+			order.setBookId(rs.getString("book_id"));
+			order.setQuantity(rs.getInt("quantity"));
+			order.setOrderedBy(rs.getTimestamp("ordered_by"));
+			
+			orders.add(order);
+		}
+		
+		return orders;
+	}
 
 	public void insertOrder(int i, String id, String category, int quantity, Timestamp sqlDate) throws SQLException {
 		Connection conn = getConnectionInstance();
@@ -200,6 +233,23 @@ public class BookDbHelper {
 		prepareStmt.setString(3, category);
 		prepareStmt.setInt(4, quantity);
 		prepareStmt.setTimestamp(5, sqlDate);
+		
+		prepareStmt.executeUpdate();
+	}
+	
+	public void updateOrder(int id, int rating, String comment) throws SQLException {
+		Connection conn = getConnectionInstance();
+		PreparedStatement prepareStmt = null;
+		
+		//SQL statement
+		String sql = "UPDATE " + BookDbHelper.ORDER_TABLE
+				+ " SET rating = ?, comment = ?"
+				+ " WHERE id = ?";
+		
+		prepareStmt = conn.prepareStatement(sql);
+		prepareStmt.setInt(1, rating);
+		prepareStmt.setString(2, comment);
+		prepareStmt.setInt(3, id);
 		
 		prepareStmt.executeUpdate();
 	}

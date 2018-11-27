@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <?php
-    $order = $this->data['order'];
+    $orderId = $this->data['orderId'];
+    $book = $this->data['book'];
     $username = $this->data['username'];
   ?>
 
 <head>
   <meta charset="utf-8">
   <title>
-    <?php echo 'Review - ' . $order['title'];?>
+    <?php echo 'Review - ' . $book->volumeInfo->title;?>
   </title>
   <link rel="stylesheet" href="/public/css/main.css" />
   <link rel="stylesheet" href="/public/css/review.css" />
@@ -36,14 +37,14 @@
       <a href="/index.php/profile" class="flex-fill text-center bg-dark-primary white py-16">Profile</a>
     </div>
     <h1 class="secondary pl-16 pr-16 pt-16">
-      <?php echo $order['title']?>
+      <?php echo $book->volumeInfo->title; ?>
     </h1>
     <p class="pl-16 m-4">
-      <?php echo $order['author']?>
+      <?php echo implode(', ', $book->volumeInfo->authors); ?>
     </p>
     <form name="addReview" class="form-group p-32" action="/index.php/review" method="POST" onsubmit="return validate();" style="text-align: left;">
       <div id="book-img-wrapper" class="form-control pl-32 m-16 pb-16">
-        <img src="<?php echo $order['image_path']; ?>" />
+        <img src="<?php echo $book->volumeInfo->imageLinks->thumbnail; ?>" />
       </div>
       <div class="form-control m-16 pb-16">
         <h2 class="tertiary">Add Rating</h2>
@@ -88,7 +89,7 @@
         <button type="button" class="button-secondary" style="float: left;" onclick="location.href='/index.php/history';">BACK</button>
         <button type="submit" class="button-primary mb-48" style="float: right;">SUBMIT</button>
       </div>
-      <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>"/>
+      <input type="hidden" name="order_id" value="<?php echo $orderId; ?>"/>
     </form>
   </div>
 </body>
