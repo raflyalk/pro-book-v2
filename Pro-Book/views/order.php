@@ -108,27 +108,31 @@
       <h2 class="tertiary">Reviews</h2>
       <?php
         $i = 0;
-        foreach ($reviews as $review):
-      ?>
-          <div class="review-section p-8">
-            <div class="review">
-              <img src="<?php echo $users[$i]['image_path'];?>" width="100px" height="100px"/>
-              <label id="uname-review">@<?php echo $users[$i]['username'];?></label>
-              <p id="comment">
-                <?php echo $review->comment;?>
-              </p>
-              <div class="rating" style="text-align: center">
-                <img class="icon" src="/public/images/svg/rating-hover.svg" width="28px" height="28px"/>
+        if ($reviews != null){
+          foreach ($reviews as $review):
+        ?>
+            <div class="review-section p-8">
+              <div class="review">
+                <img src="<?php echo $users[$i]['image_path'];?>" width="100px" height="100px"/>
+                <label id="uname-review">@<?php echo $users[$i]['username'];?></label>
+                <p id="comment">
+                  <?php echo $review->comment;?>
+                </p>
+                <div class="rating" style="text-align: center">
+                  <img class="icon" src="/public/images/svg/rating-hover.svg" width="28px" height="28px"/>
+                </div>
+                <p id="rating-num">
+                  <?php echo $review->rating;?>.0 / 5.0
+                </p>
               </div>
-              <p id="rating-num">
-                <?php echo $review->rating;?>.0 / 5.0
-              </p>
             </div>
-          </div>
-      <?php
-          $i++;
-        endforeach;
-      ?>
+        <?php
+            $i++;
+          endforeach;
+        } else {
+          echo "&nbsp; Review not found..";
+        }
+        ?>
     </div>
     <div class="pl-16 ml-4">
       <h2 class="tertiary">Recommendation Books</h2>
