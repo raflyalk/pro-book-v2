@@ -3,6 +3,8 @@
 <?php
     $book = $this->data['book'];
     $recommendedbooks = $this->data['recommendedbooks'];
+    $reviews = $this->data['reviews'];
+    $users = $this->data['users'];
     $username = $this->data['username'];
 ?>
 
@@ -88,7 +90,7 @@
           <label class="mr-24">Jumlah: </label>
           <select id="qty">
             <?php
-              for($i = 1; $i <= 99; $i++):
+              for($i = 1; $i <= $book->volumeInfo->quantity; $i++):
             ?>
                 <option value="<?php echo $i;?>"><?php echo $i;?></option>
             <?php
@@ -104,27 +106,33 @@
   <div class="container w-60 p-24 mt-24">
     <div class="pl-16 ml-4">
       <h2 class="tertiary">Reviews</h2>
-      <!-- <?php
-        // foreach ($reviews as $review):
-      ?>
-          <div class="review-section p-8">
-            <div class="review">
-              <img src="<?php echo $review['image_path'];?>" width="100px" height="100px"/>
-              <label id="uname-review">@<?php echo $review['username'];?></label>
-              <p id="comment">
-                <?php echo $review['comment'];?>
-              </p>
-              <div class="rating" style="text-align: center">
-                <img class="icon" src="/public/images/svg/rating-hover.svg" width="28px" height="28px"/>
-              </div>
-              <p id="rating-num">
-                <?php echo $review['rating'];?>.0 / 5.0
-              </p>
-            </div>
-          </div>
       <?php
-        // endforeach;
-      ?> -->
+        $i = 0;
+        if ($reviews != null){
+          foreach ($reviews as $review):
+        ?>
+            <div class="review-section p-8">
+              <div class="review">
+                <img src="<?php echo $users[$i]['image_path'];?>" width="100px" height="100px"/>
+                <label id="uname-review">@<?php echo $users[$i]['username'];?></label>
+                <p id="comment">
+                  <?php echo $review->comment;?>
+                </p>
+                <div class="rating" style="text-align: center">
+                  <img class="icon" src="/public/images/svg/rating-hover.svg" width="28px" height="28px"/>
+                </div>
+                <p id="rating-num">
+                  <?php echo $review->rating;?>.0 / 5.0
+                </p>
+              </div>
+            </div>
+        <?php
+            $i++;
+          endforeach;
+        } else {
+          echo "&nbsp; Review not found..";
+        }
+        ?>
     </div>
     <div class="pl-16 ml-4">
       <h2 class="tertiary">Recommendation Books</h2>

@@ -2,6 +2,8 @@ import ws.*;
 
 import javax.xml.ws.Endpoint;
 
+import database.BookDbHelper;
+
 public class Main {
 	public static void main(String[] args) {
 		try {

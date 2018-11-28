@@ -5,15 +5,28 @@ require_once('./models/User.php');
 require_once('./models/Order.php');
 require_once('./models/Review.php');
 require_once('./controllers/Auth.php');
+require_once('./libs/nusoap/nusoap.php');
 
 class OrderController extends Controller
 {
+  private $clientSearch;
+  private $clientRecommend;
+  private $clientOrder;
+
   /**
    * Constructs UserController.
    *
    */
   public function __construct()
   {
+    $this->clientSearch = new nusoap_client('http://localhost:4789/services/search?wsdl', 'wsdl');
+    $this->clientOrder = new nusoap_client('http://localhost:4789/services/order?wsdl', 'wsdl');
+    $this->clientRecommend = new nusoap_client('http://localhost:4789/services/recommendation?wsdl', 'wsdl');
+
+    if ($this->clientSearch->getError() || $this->clientRecommend->getError() || $this->clientOrder->getError()){
+      echo 'error!';
+    }
+
     if (!Auth::check()){
       return $this->redirect('/index.php/login');
     }
@@ -29,7 +42,7 @@ class OrderController extends Controller
     if (Session::exist('isloginbygoogle')){
       $isSignedIn = Session::get('isloginbygoogle');
       if ($isSignedIn){
-        $orders = $order->getByUser(Session::get('google')['username']);
+        $orders = $this->clientOrder->call('getOrderHistoryById', array('userId' => Session::get('google')['id']));
 
         return $this->view('history.php', [
           'username' => Session::get('google')['username'],
@@ -41,10 +54,21 @@ class OrderController extends Controller
         ]);
       }
     } else {
-      $orders = $order->getByUser(Auth::user()['id']);
+      $orders = $this->clientOrder->call('getOrderHistoryById', array('userId' => Auth::user()['id']));
+      $orders = json_decode($orders);
+
+      $books = array();
+
+      $i = 0;
+      foreach ($orders as $order) {
+        $book = $this->clientSearch->call('getBookDetails', array('id' => $order->bookId));
+        $books[$i] = json_decode($book);
+        $i++;
+      }
 
       return $this->view('history.php', [
         'orders' => $orders,
+        'books' => $books,
         'username' => Auth::user()['username'],
       ]);
     }
@@ -53,33 +77,43 @@ class OrderController extends Controller
   /**
    * Redirect to order page.
    */
-  public function create($request)
-  {
-    $book = new Book();
-    $book = $book->getAvgRatingById($request['book-id'])[0];
+   public function create($request)
+   {
+     $id = $request['id'];
 
-    $reviews = new Review();
-    $reviews = $reviews->getByBookId($request['book-id']);
+     if ($id == null){
+       echo "Book id is not specified";
+     } else {
+       $result = $this->clientSearch->call('getBookDetails', array('id' => $id));
 
-    if (Session::exist('isloginbygoogle')){
-      $isSignedIn = Session::get('isloginbygoogle');
-      if ($isSignedIn){
-        return $this->view('order.php', [
-          'book' => $book,
-          'reviews' => $reviews,
-          'user' => Session::get('google'),
-        ]);
-      } else {
-        return $this->redirect('/index.php/login', [
-          'message' => 'Problem encountered'
-        ]);
-      }
-    }
+       $categories = json_decode($result)->volumeInfo->categories;
+       $reviews = json_decode($result)->volumeInfo->reviews;
 
-    return $this->view('order.php', [
-      'book' => $book,
-      'reviews' => $reviews,
-      'user' => Auth::user(),
-    ]);
-  }
+       $recommendedbooks = $this->clientRecommend->call('getRecommendedBooks', array('categories' => $categories[0]));
+       $user = new User();
+       $users = array();
+       $i = 0;
+
+       foreach ($reviews as $review) {
+         $user = $user->find($review->userId);
+         $users[$i] = $user;
+         $i++;
+       }
+
+       if ($result == null){
+         echo "Error, result null!";
+       } else {
+         $result = json_decode($result);
+         $recommendedbooks = json_decode($recommendedbooks);
+
+         return $this->view('order.php', [
+           'book' => $result,
+           'recommendedbooks' => $recommendedbooks,
+           'reviews' => $reviews,
+           'users' => $users,
+           'username' => Auth::user()['username']
+         ]);
+       }
+     }
+   }
 }

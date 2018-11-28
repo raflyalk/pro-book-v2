@@ -1,13 +1,19 @@
 package ws;
 
+import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.jws.WebService;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import api.GoogleBooksAPI;
 import database.BookDbHelper;
 import model.Book;
+import model.Order;
 
 @WebService(endpointInterface = "ws.OrderService")
 public final class OrderServiceImpl implements OrderService {
@@ -24,7 +30,7 @@ public final class OrderServiceImpl implements OrderService {
 		success = true;
 		if (success) {
 			Date date = new Date();
-			java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+			java.sql.Timestamp sqlDate = new java.sql.Timestamp(date.getTime());
 			
 			Book book = GoogleBooksAPI.getBookDetail(bookId);
 			
@@ -42,6 +48,39 @@ public final class OrderServiceImpl implements OrderService {
 			}
 			
 			return "{\"success\":1}";
+		}
+		
+		return "{\"success\":0}";
+	}
+
+	@Override
+	public String getOrderHistoryById(int userId) {
+		BookDbHelper db = new BookDbHelper();
+		ArrayList<Order> orders = new ArrayList<>();
+		
+		try {
+			orders = db.getOrderHistoryById(userId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		//Remove unused data
+		Gson gson = new Gson();
+		Type listOrderType = new TypeToken<ArrayList<Order>>() {}.getType();
+		
+		return gson.toJson(orders, listOrderType);
+	}
+
+	@Override
+	public String updateOrder(int id, int rating, String comment) {
+		BookDbHelper db = new BookDbHelper();
+		
+		try {
+			db.updateOrder(id, rating, comment);
+			
+			return "{\"success\":1}";
+		} catch (SQLException ex) {
+			ex.printStackTrace();
 		}
 		
 		return "{\"success\":0}";

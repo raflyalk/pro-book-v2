@@ -1,12 +1,16 @@
 package database;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+
+import model.Order;
+import model.Review;
 
 public class BookDbHelper {
 	private final static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
@@ -15,7 +19,6 @@ public class BookDbHelper {
 	private final static String PASS = "Allofthings1";
 	private final static String ORDER_TABLE = "orders";
 	private final static String BOOK_TABLE = "books";
-	private final static String REVIEW_TABLE = "reviews";
 	private static Connection conn;
 	
 	private static Connection getConnectionInstance() {
@@ -48,23 +51,15 @@ public class BookDbHelper {
 	            + "   user_id			int(10),"
 	            + "   book_id			varchar(255),"
 	            + "   category			varchar(255),"
-	            + "	  quantity			int(10),"	
+	            + "	  quantity			int(10),"
+	            + "	  rating			int(1) NULL,"
+	            + "   comment			text NULL,"	
 	            + "   ordered_by		datetime)";
 
 	    Statement stmt = conn.createStatement();
 	    stmt.execute(sqlCreate);
 	}
 	
-//	private static void createReviewTableIfNotExist() throws SQLException {
-//		String sqlCreate = "CREATE TABLE IF NOT EXISTS " + REVIEW_TABLE
-//	            + "  (id				int(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
-//	            + "   book_id			varchar(255),"
-//	            + "   rating			char(1),"
-//	            + "	  comment			varchar(255))";
-//		
-//		Statement stmt = conn.createStatement();
-//		stmt.execute(sqlCreate);
-//	}
 	private static void createBookTableIfNotExist() throws SQLException {
 	    String sqlCreate = "CREATE TABLE IF NOT EXISTS " + BOOK_TABLE
 	            + "  (id				int(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
@@ -137,8 +132,93 @@ public class BookDbHelper {
 		
 		return null;
 	}
+	
+	public float getAvgRatingByBookId(String bookId) throws SQLException {
+		Connection conn = getConnectionInstance();
+		PreparedStatement prepareStmt = null;
+		
+		//SQL statement
+		String sql = "SELECT DISTINCT book_id, AVG(rating) as avg_rating" 
+				+ " FROM " + BookDbHelper.ORDER_TABLE
+				+ " WHERE book_id = \"" + bookId + "\"" 
+				+ " GROUP BY user_id, book_id";
+		
+		//Set prepared stmt
+		prepareStmt = conn.prepareStatement(sql);
+		
+		//Get result 
+		ResultSet rs = prepareStmt.executeQuery();
+		
+		//If exist
+		if (rs.next()) {
+			return rs.getFloat("avg_rating");
+		}
+		
+		return 0f;
+	}
+	
+	public ArrayList<Review> getReviewsByBookId(String bookId) throws SQLException {
+		Connection conn = getConnectionInstance();
+		PreparedStatement prepareStmt = null;
+		
+		//SQL statement
+		String sql = "SELECT DISTINCT user_id, book_id, ordered_by, rating, comment" 
+				+ " FROM " + BookDbHelper.ORDER_TABLE
+				+ " WHERE rating IS NOT NULL and comment IS NOT NULL and book_id =\"" + bookId + "\"";
+		
+		//Set prepared stmt
+		prepareStmt = conn.prepareStatement(sql);
+		
+		//Get result 
+		ResultSet rs = prepareStmt.executeQuery();
+		ArrayList<Review> reviews = new ArrayList<>();
+		
+		//If exist
+		if (rs.next()) {
+			Review review = new Review();
+			review.setComment(rs.getString("comment"));
+			review.setRating(rs.getInt("rating"));
+			review.setUserId(rs.getInt("user_id"));
+			
+			reviews.add(review);
+		}
+		
+		return reviews;
+	}
+	
+	public ArrayList<Order> getOrderHistoryById(int userId) throws SQLException {
+		Connection conn = getConnectionInstance();
+		PreparedStatement prepareStmt = null;
+		
+		//SQL statement
+		String sql = "SELECT DISTINCT id,book_id, quantity, rating, comment, ordered_by" 
+				+ " FROM " + BookDbHelper.ORDER_TABLE
+				+ " WHERE user_id =\"" + userId + "\"";
+		
+		//Set prepared stmt
+		prepareStmt = conn.prepareStatement(sql);
+		
+		//Get result 
+		ResultSet rs = prepareStmt.executeQuery();
+		ArrayList<Order> orders = new ArrayList<>();
+		
+		//If exist
+		if (rs.next()) {
+			Order order = new Order();
+			order.setId(rs.getInt("id"));
+			order.setComment(rs.getString("comment"));
+			order.setRating(rs.getInt("rating"));
+			order.setBookId(rs.getString("book_id"));
+			order.setQuantity(rs.getInt("quantity"));
+			order.setOrderedBy(rs.getTimestamp("ordered_by"));
+			
+			orders.add(order);
+		}
+		
+		return orders;
+	}
 
-	public void insertOrder(int i, String id, String category, int quantity, Date sqlDate) throws SQLException {
+	public void insertOrder(int i, String id, String category, int quantity, Timestamp sqlDate) throws SQLException {
 		Connection conn = getConnectionInstance();
 		PreparedStatement prepareStmt = null;
 		
@@ -152,7 +232,24 @@ public class BookDbHelper {
 		prepareStmt.setString(2, id);
 		prepareStmt.setString(3, category);
 		prepareStmt.setInt(4, quantity);
-		prepareStmt.setDate(5, sqlDate);
+		prepareStmt.setTimestamp(5, sqlDate);
+		
+		prepareStmt.executeUpdate();
+	}
+	
+	public void updateOrder(int id, int rating, String comment) throws SQLException {
+		Connection conn = getConnectionInstance();
+		PreparedStatement prepareStmt = null;
+		
+		//SQL statement
+		String sql = "UPDATE " + BookDbHelper.ORDER_TABLE
+				+ " SET rating = ?, comment = ?"
+				+ " WHERE id = ?";
+		
+		prepareStmt = conn.prepareStatement(sql);
+		prepareStmt.setInt(1, rating);
+		prepareStmt.setString(2, comment);
+		prepareStmt.setInt(3, id);
 		
 		prepareStmt.executeUpdate();
 	}

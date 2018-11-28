@@ -12,10 +12,10 @@ Route::post('register', 'Auth@handleRegister');
 
 /** HomeController */
 Route::get('home', 'HomeController@index');
-Route::get('search', 'HomeController@search');
+Route::post('search', 'HomeController@search');
 
 /** OrderController */
-Route::get('book', 'SoapServiceController@getBookDetails');
+Route::get('book', 'OrderController@create');
 Route::get('history', 'OrderController@index');
 
 /** ReviewController */
@@ -36,5 +36,5 @@ Route::get('apis/validate-email', 'ValidateEmail');
 Route::get('apis/validate-username', 'ValidateUsername');
 Route::get('apis/validate-card-number', 'ValidateCardNumber');
 
-//Experimental
-Route::post('books', 'SoapServiceController@searchBooks');
+/*Experimental*/
+Route::get('testorder', 'SoapServiceController@order');

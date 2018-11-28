@@ -114,9 +114,9 @@
 
       const usernameValid = document.getElementById('usernameValid').value == 1;
       const emailValid = document.getElementById('emailValid').value == 1;
-      const cardNumberValid = document.getElementById('cardNumberValid').value == 1;
+      const cardNumberValid = document.getElementById('cardNumberValid').value;
 
-      if (validity.result && usernameValid && emailValid && cardNumberValid) {
+      if (validity.result && usernameValid && emailValid && cardNumberValid == 1) {
         document.registerForm.submit();
       } else if (validity.message !== 'OK') {
         validation.display(validity.message);
@@ -124,8 +124,10 @@
         validation.display('username is already used');
       } else if (!emailValid) {
         validation.display('email is already used');
-      } else  {
+      } else if (cardNumberValid == -1) {
         validation.display('card number is already used');
+      } else if (cardNumberValid == -2) {
+        validation.display('card not yet registered in our bank service');
       }
     }
 
@@ -182,33 +184,57 @@
       };
       xhr.send();
     };
-    
-      document.getElementById('cardNumberField').onblur = function () {
-      const value = this.value;
-      const xhr = new XMLHttpRequest();
+
+    function makeGetRequest(url) {
+      return new Promise(function(resolve, reject) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            resolve(xhr.responseText);
+          } else {
+            reject('Request failed.  Returned status of ' + xhr.status);
+          }
+        }
+        xhr.error = function()  {
+          reject('Request failed');
+        }
+        xhr.send();
+      });
+    }
+
+    document.getElementById('cardNumberField').onblur = function()  {
+      const urlProbook = `/index.php/apis/validate-card-number?card-number=${this.value}`;
+      const urlBank = `http://localhost:3000/validate-card?card_number=${this.value}`;
       const expValid = validation.required([
-        document.registerForm.card_number,
-      ]).result;
-      xhr.open('GET', `/index.php/apis/validate-card-number?card-number=${value}`);
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          const available = JSON.parse(xhr.responseText).result;
+          document.registerForm.card_number,
+        ]).result;
+      if (expValid) {        
+        Promise.all([makeGetRequest(urlProbook), makeGetRequest(urlBank)])
+        .then((result) => {
+          resultProbook = JSON.parse(result[0]).result;
+          resultBank = JSON.parse(result[1]).isExist;
           var img = document.getElementById('cardNumberValidity');
-          if (expValid && available) {
+          if (!resultProbook) {
+            document.getElementById('cardNumberValid').value = -1;
+            img.hidden = false;
+            img.src = '/public/images/svg/remove-symbol.svg'; 
+          } else if (!resultBank) {
+            document.getElementById('cardNumberValid').value = -2;
+            img.hidden = false;
+            img.src = '/public/images/svg/remove-symbol.svg'; 
+          } else {
             document.getElementById('cardNumberValid').value = 1;
             img.hidden = false;
             img.src = '/public/images/svg/check-sign.svg';
-          } else {
-            document.getElementById('cardNumberValid').value = 0;
-            img.hidden = false;
-            img.src = '/public/images/svg/remove-symbol.svg';
-          };
-        } else {
-          console.log('Request failed.  Returned status of ' + xhr.status);
-        }
-      };
-      xhr.send();
-    };
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
+    }
+
   </script>
 </body>
 </html>
