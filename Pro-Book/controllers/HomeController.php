@@ -14,7 +14,7 @@ class HomeController extends Controller
 	 */
   public function __construct()
   {
-    $this->clientSearch = new nusoap_client('http://localhost:4789/services/search?wsdl', 'wsdl');
+    $this->clientSearch = new nusoap_client($_ENV['BOOK_WS_API'] . '/services/search?wsdl', 'wsdl');
 
     if ($this->clientSearch->getError()){
       echo 'error!';

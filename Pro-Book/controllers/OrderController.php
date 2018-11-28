@@ -19,9 +19,9 @@ class OrderController extends Controller
    */
   public function __construct()
   {
-    $this->clientSearch = new nusoap_client('http://localhost:4789/services/search?wsdl', 'wsdl');
-    $this->clientOrder = new nusoap_client('http://localhost:4789/services/order?wsdl', 'wsdl');
-    $this->clientRecommend = new nusoap_client('http://localhost:4789/services/recommendation?wsdl', 'wsdl');
+    $this->clientSearch = new nusoap_client($_ENV['BOOK_WS_API'] . '/services/search?wsdl', 'wsdl');
+    $this->clientOrder = new nusoap_client($_ENV['BOOK_WS_API'] . '/services/order?wsdl', 'wsdl');
+    $this->clientRecommend = new nusoap_client($_ENV['BOOK_WS_API'] . '/services/recommendation?wsdl', 'wsdl');
 
     if ($this->clientSearch->getError() || $this->clientRecommend->getError() || $this->clientOrder->getError()){
       echo 'error!';

@@ -7,7 +7,7 @@ class SoapServiceController extends Controller {
 
   public function __construct()
   {
-    $this->client = new nusoap_client('http://localhost:4789/services/order?wsdl', 'wsdl');
+    $this->client = new nusoap_client($_ENV['BOOK_WS_API'] . '/services/order?wsdl', 'wsdl');
 
     if ($this->client->getError()){
       echo 'Error occurs';

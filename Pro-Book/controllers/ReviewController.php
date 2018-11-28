@@ -15,8 +15,8 @@ class ReviewController extends Controller
    */
   public function __construct()
   {
-    $this->clientSearch = new nusoap_client('http://localhost:4789/services/search?wsdl', 'wsdl');
-    $this->clientOrder = new nusoap_client('http://localhost:4789/services/order?wsdl', 'wsdl');
+    $this->clientSearch = new nusoap_client($_ENV['BOOK_WS_API'] . '/services/search?wsdl', 'wsdl');
+    $this->clientOrder = new nusoap_client($_ENV['BOOK_WS_API'] . '/services/order?wsdl', 'wsdl');
 
     if ($this->clientSearch->getError() || $this->clientOrder->getError()){
       echo 'error!';
