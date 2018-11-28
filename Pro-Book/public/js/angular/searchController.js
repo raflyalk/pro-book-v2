@@ -7,7 +7,7 @@ searchApp.controller('searchController', function($scope, $http){
     if ($scope.formData.search_bar == ""){
       alert("Fill the search bar!");
     } else {
-      document.getElementById("loading_text").innerHTML = "Retrieving data from Book WebService..";
+      document.getElementById("loading_text").innerHTML = '<div class="loader"></div>';
       $http({
         method : "POST",
         url : "/index.php/search",

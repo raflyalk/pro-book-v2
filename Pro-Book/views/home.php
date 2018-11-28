@@ -35,7 +35,7 @@
             Search
           </button>
         </div>
-        <h3 id="loading_text"></h3>
+        <div id="loading_text"></div>
   		</div>
       <div id="search_result" class="content p-24" style="display: none;">
   			<div class="d-flex justify-content-between align-items-end mb-24">
